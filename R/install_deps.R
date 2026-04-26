@@ -8,4 +8,4 @@ install_python_deps <- function(envname = "SDmethod_env", python=NULL) {
   )
 }
 
-# Claude also helped me here.
+# Note: Claude helped me here.
