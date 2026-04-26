@@ -3,9 +3,8 @@
 ## Installation
 Run the following in the R console:
 ```{r}
-devtools::install_github(“Jseid628/SDmethod")
+devtools::install_github("Jseid628/SDmethod")
 ```
-
 ## Python Setup 
 1. Install Python 3.11 (recommended) from python.org 
 2. Run in R console (replacing the generic path with your own): 
