@@ -8,6 +8,7 @@
 #' @param output_dir The user's working directory
 #' @param python_env Path to a python virtual environment with the necessary dependencies, see README.
 #' @param num_workers Number of cores to use to run the simulation
+#' @param n_units
 #'
 #' @examples
 #' \dontrun{
@@ -17,10 +18,20 @@
 #'                  )
 #' }
 #' @export
-run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL) {
+run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL) {
   message("Running simulation...(Ignore silly CVXPY errors)")
   if (is.null(num_workers)) {
     num_workers <- parallel::detectCores() - 1
+  }
+  if (is.null(n_units)) {
+    n <- 50
+  } else {
+    n <- n_units # number of units
+  }
+  if (is.null(D)) {
+    embedding_dim = 10
+  } else {
+    embedding_dim = D
   }
 
   suppressWarnings(suppressMessages({
@@ -45,7 +56,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
       if (!is.null(python_env)) {
         reticulate::use_virtualenv(python_env, required = TRUE)
       }
-      n <- 50 # number of units
+
       # N x 1 vector
       mu <- list(c = seq(5, 1, length.out = n))
       mu$c[c(1, 2)] <- mu$c[c(2, 1)]; # hand-code factor loadings for n = 50 (common part)
@@ -61,7 +72,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
 
       all_results <- lapply(1:n_sim, function(s) {
         iter_start = proc.time()
-        result <-fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40)
+        result <-fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40,embedding_dim)
         result$iter_time <- (proc.time() - iter_start)["elapsed"]
         return(result)
       })

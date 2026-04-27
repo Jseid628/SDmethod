@@ -21,7 +21,7 @@ run_sim <- function(rho,n_sim, output_dir = getwd(),python_env=NULL) {
   }
   message("Running simulation....")
   # factor loadings
-  n <- 50 # number of units, the first unit is treated
+  n <- 10 # number of units, the first unit is treated
 
   mu <- list(
     c = seq(5, 1, length.out = n) # N x 1 vector

@@ -8,7 +8,7 @@
 #' @param variance variance of the noise term
 #' @param num_timepoints Number of training timepoints to use. Defaults to t_total.
 #' @export
-fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL) {
+fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL,embedding_dim) {
 
   python_path <- system.file("python", package = "SDmethod")
   morph <- reticulate::import_from_path("morphData", path = python_path)
@@ -62,7 +62,7 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   test_covariate_matrix <- result[[4]]
 
   # using the orthogonal, fixed weights version of the estimator
-  result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, 10L, 1000L, 0.0, 0.0, FALSE, NULL, "eye", TRUE)
+  result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, embedding_dim, 1000L, 0.0, 0.0, FALSE, NULL, "eye", TRUE)
   Q_matrix <- result[[1]]
   w_learnQ <- result[[2]]
 
