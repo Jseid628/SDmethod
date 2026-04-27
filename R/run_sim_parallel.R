@@ -7,6 +7,7 @@
 #' @param n_sim Number of simulations
 #' @param output_dir The user's working directory
 #' @param python_env Path to a python virtual environment with the necessary dependencies, see README.
+#' @param num_workers Number of cores to use to run the simulation
 #'
 #' @examples
 #' \dontrun{
@@ -16,8 +17,11 @@
 #'                  )
 #' }
 #' @export
-run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL) {
+run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL) {
   message("Running simulation...(Ignore silly CVXPY errors)")
+  if (is.null(num_workers)) {
+    num_workers <- parallel::detectCores() - 1
+  }
 
   suppressWarnings(suppressMessages({
     settings_list <- list(
@@ -36,7 +40,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL) {
 
     # Claude was very helpful with writing the parallelization piece here:
     # mclapply did not work with Reticulate and Claude suggested the future package.
-    future::plan(future::multisession, workers = 14)
+    future::plan(future::multisession, workers = num_workers)
     results <- furrr::future_map(settings_list, function(setting) {
       if (!is.null(python_env)) {
         reticulate::use_virtualenv(python_env, required = TRUE)

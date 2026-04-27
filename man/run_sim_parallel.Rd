@@ -4,7 +4,13 @@
 \alias{run_sim_parallel}
 \title{Run simulation in parallel}
 \usage{
-run_sim_parallel(rho, n_sim, output_dir = getwd(), python_env = NULL)
+run_sim_parallel(
+  rho,
+  n_sim,
+  output_dir = getwd(),
+  python_env = NULL,
+  num_workers = NULL
+)
 }
 \arguments{
 \item{rho}{Mixing coefficient}
@@ -14,6 +20,8 @@ run_sim_parallel(rho, n_sim, output_dir = getwd(), python_env = NULL)
 \item{output_dir}{The user's working directory}
 
 \item{python_env}{Path to a python virtual environment with the necessary dependencies, see README.}
+
+\item{num_workers}{Number of cores to use to run the simulation}
 }
 \description{
 This function creates a figure comparing the bias of the estimators in the users current working directory.
@@ -21,9 +29,9 @@ It also returns a summary of the lengths of the Monte Carlo iterations.
 }
 \examples{
 \dontrun{
-run_sim(rho = 1,
-        n_sim = 3,
-        python_env="path/to/your/env"
-        )
+run_sim_parallel(rho = 1,
+                 n_sim = 3,
+                 python_env="path/to/your/env"
+                 )
 }
 }
