@@ -56,15 +56,17 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
 
   result <- morph$morph(treated_data, control_data)
 
-  train_target_vectors <- as.matrix(result[[1]])
-  train_covariate_matrices <- as.matrix(result[[2]])
-  test_target_vector <- as.matrix(result[[3]])
-  test_covariate_matrix <- as.matrix(result[[4]])
+  # when this was not as.matrix wrapping these things would run sometimes...but would
+  # often get a "object is from previous session error"
+  train_target_vectors <- reticulate::py_to_r(result[[1]])
+  train_covariate_matrices <- reticulate::py_to_r(result[[2]])
+  test_target_vector <- reticulate::py_to_r(result[[3]])
+  test_covariate_matrix <- reticulate::py_to_r(result[[4]])
 
   # using the orthogonal, fixed weights version of the estimator
   result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, embedding_dim, 1000L, 0.0, 0.0, FALSE, NULL, "eye", TRUE)
-  Q_matrix <- as.matrix(result[[1]])
-  w_learnQ <- as.matrix(result[[2]])
+  Q_matrix <- reticulate::py_to_r(result[[1]])
+  w_learnQ <- reticulate::py_to_r(result[[2]])
 
   # we use the Q_weights just as w_sep, w_cat, w_avg
   Q_weights <- Q_matrix %*% w_learnQ
