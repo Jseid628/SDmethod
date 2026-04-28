@@ -60,8 +60,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
     })
 
     # Claude was very helpful with writing the parallelization piece here:
-    future::plan(future::multicore, workers = num_workers)
-    results <- furrr::future_map(seq_along(settings_list), function(i) {  # iterate over indices
+    results <- lapply(seq_along(settings_list), function(i) {
       setting <- settings_list[[i]]
       model <- models[[i]]
       t_total <- setting$t_total
@@ -100,15 +99,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
         dplyr::mutate(setting = setting$file_suffix)
 
       return(list(bias_sim_long = bias_sim_long, iter_lengths = iter_lengths))
-      ## end function ##
-    }, .options = furrr::furrr_options(
-      globals = c("rho", "n_sim", "python_env", "models", "settings_list", "trt", "n", "embedding_dim"),
-      seed = TRUE,
-      packages = "SDmethod"
-      )
-    )
-
-    future::plan(future::sequential)
+    })
 
     # reassemble across settings
     all_bias_sim_long <- data.frame()
