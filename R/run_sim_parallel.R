@@ -55,7 +55,8 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
     trt <- numeric(n); trt[1] <- 1; # select the unit with the second largest loadings to be the treated unit
 
     models <- lapply(settings_list, function(setting) {
-      generateModel(setting$t_total, setting$k_total, trt, mu, rho, n)
+      m <- generateModel(setting$t_total, setting$k_total, trt, mu, rho, n)
+      as.matrix(m)  # force to plain R matrix before passing to workers
     })
 
     # Claude was very helpful with writing the parallelization piece here:
@@ -101,7 +102,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
       return(list(bias_sim_long = bias_sim_long, iter_lengths = iter_lengths))
       ## end function ##
     }, .options = furrr::furrr_options(
-      globals = c("rho","n_sim","python_env"),
+      globals = c("rho", "n_sim", "python_env", "models", "settings_list", "trt", "n", "embedding_dim"),
       seed = TRUE,
       packages = "SDmethod"
       )
