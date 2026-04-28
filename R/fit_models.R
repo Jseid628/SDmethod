@@ -66,7 +66,7 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   test_covariate_matrix <- reticulate::py_to_r(result[[4]])
 
   # using the orthogonal, fixed weights version of the estimator
-  result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, embedding_dim, 1000L, 0.0, 0.0, FALSE, NULL, "eye", TRUE)
+  result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0.0, 0.0, FALSE, NULL, "eye", TRUE)
   Q_matrix <- reticulate::py_to_r(result[[1]])
   w_learnQ <- reticulate::py_to_r(result[[2]])
 
