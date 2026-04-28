@@ -60,7 +60,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
     })
 
     # Claude was very helpful with writing the parallelization piece here:
-    future::plan(future::multisession, workers = num_workers)
+    future::plan(future::multicore, workers = num_workers)
     results <- furrr::future_map(seq_along(settings_list), function(i) {  # iterate over indices
       setting <- settings_list[[i]]
       model <- models[[i]]
