@@ -31,13 +31,13 @@ generateModel <- function(t_total, k_total, trt, mu, rho, n) {
   cor(mu$i[,1],mu$c)
   cor(mu$i[,1],mu$i[,2])
 
-  theo_w <- synth_qp(mu$c[trt], as.matrix(mu$c[-trt])); # confirm we can find the oracle weights
+  theo_w <- reticulate::py_to_r(synth_qp(mu$c[trt], as.matrix(mu$c[-trt]))); # confirm we can find the oracle weights
   SCMbias(mu$c[-trt]*factors$c[t_total+1], mu$c[trt]*factors$c[t_total+1],theo_w)
 
 
   mu$i[trt,] <- t(theo_w)%*%mu$i[-trt,] # overwrite the idiosyncratic loadings to ensure oracle weights exist
 
-  theo_w <- synth_qp(c(mu$c[trt],mu$i[trt,]), as.matrix(cbind(mu$c[-trt],mu$i[-trt,]))); # confirm we can find the oracle weights
+  theo_w <- reticulate::py_to_r(synth_qp(c(mu$c[trt],mu$i[trt,]), as.matrix(cbind(mu$c[-trt],mu$i[-trt,])))); # confirm we can find the oracle weights
   SCMbias(mu$c[-trt]*factors$c[t_total+1] + mu$i[-trt,1]*factors$i[t_total+1,1],
           mu$c[trt]*factors$c[t_total+1] + mu$i[trt,1]*factors$i[t_total+1,1],
           theo_w)
