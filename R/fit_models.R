@@ -27,24 +27,26 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   out_trt <- matrix(out[which(t_trt==1),],nrow = t_train,ncol =k_total)  # T x K matrix of outcomes for the treated unit
   out_control <- out[which(t_trt==0),] # ((N-1)xT) x (K) matrix of outcomes for the control units
 
+
+
   ## calculate SCM weights
   out_trt_sep <- out_trt[,1]
   out_control_sep <- matrix(out_control[,1], nrow = n-1,ncol=t_train)
-  w_sep <- synth_qp(out_trt_sep, out_control_sep);
+  w_sep <- reticulate::py_to_r(synth_qp(out_trt_sep, out_control_sep))
   r.svd <- svd(rbind(out_control_sep,out_trt_sep))
   largest_svd <- r.svd$d[1]^2/sum(r.svd$d^2)
   cond <-  r.svd$d[1]/r.svd$d[t_train]
 
   out_trt_cat <- matrix(out_trt, nrow = t_train*k_total, ncol = 1)
   out_control_cat <- matrix(out_control, nrow = n-1,ncol=t_train*k_total)
-  w_cat <- synth_qp(out_trt_cat, out_control_cat);
+  w_cat <- reticulate::py_to_r(synth_qp(out_trt_cat, out_control_cat))
   r.svd <- svd(rbind(out_control_cat,t(out_trt_cat)))
   largest_svd <- cbind(largest_svd, r.svd$d[1]^2/sum(r.svd$d^2))
   cond <- cbind(cond,  r.svd$d[1]/r.svd$d[length(r.svd$d)])
 
   out_trt_avg <- rowMeans(out_trt)
   out_control_avg <- matrix(rowMeans(out_control), nrow = n-1,ncol=t_train)
-  w_avg <- synth_qp(out_trt_avg, out_control_avg);
+  w_avg <- reticulate::py_to_r(synth_qp(out_trt_avg, out_control_avg))
   r.svd <- svd(rbind(out_control_avg,t(out_trt_avg)))
   largest_svd <- cbind(largest_svd, r.svd$d[1]^2/sum(r.svd$d^2))
   cond <- cbind(cond,  r.svd$d[1]/r.svd$d[t_total])
@@ -75,12 +77,18 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   model_t1 <- model[((n * t_total)+1):(n * (t_total+1)),]
 
   # just calculate the bias in the first outcome.
-  oracle_bias_sep <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_sep)
-  oracle_bias_cat <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_cat)
-  oracle_bias_avg <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_avg)
 
+  oracle_bias_sep <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_sep)))
+  oracle_bias_cat <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_cat)))
+  oracle_bias_avg <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_avg)))
   # Add bias calculation for Q weights here:
-  oracle_bias_Q <- SCMbias(model_t1[-trt,1],model_t1[trt,1],Q_weights) # this may not be the correct dimensions.
+  oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], Q_weights)))
+
+  # oracle_bias_sep <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_sep)
+  # oracle_bias_cat <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_cat)
+  # oracle_bias_avg <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_avg)
+
+  # oracle_bias_Q <- SCMbias(model_t1[-trt,1],model_t1[trt,1],Q_weights) # this may not be the correct dimensions.
 
   return(list("oracle_bias" = c(oracle_bias_sep, oracle_bias_cat, oracle_bias_avg,as.numeric(oracle_bias_Q)), # added bias_Q
               "out" = out,
