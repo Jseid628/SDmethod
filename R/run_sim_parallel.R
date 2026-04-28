@@ -63,6 +63,8 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
     results <- furrr::future_map(seq_along(settings_list), function(i) {  # iterate over indices
       setting <- settings_list[[i]]
       model <- models[[i]]
+      t_total <- setting$t_total
+      k_total <- setting$k_total
       if (!is.null(python_env)) {
         reticulate::use_virtualenv(python_env, required = TRUE)
       }
