@@ -49,30 +49,29 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
       iter_length = numeric()
     )
 
+    # N x 1 vector
+    mu <- list(c = seq(5, 1, length.out = n))
+    mu$c[c(1, 2)] <- mu$c[c(2, 1)]; # hand-code factor loadings for n = 50 (common part)
+    trt <- numeric(n); trt[1] <- 1; # select the unit with the second largest loadings to be the treated unit
+
+    models <- lapply(settings_list, function(setting) {
+      generateModel(setting$t_total, setting$k_total, trt, mu, rho, n)
+    })
+
     # Claude was very helpful with writing the parallelization piece here:
-    # mclapply did not work with Reticulate and Claude suggested the future package.
     future::plan(future::multisession, workers = num_workers)
-    results <- furrr::future_map(settings_list, function(setting) {
+    results <- furrr::future_map(seq_along(settings_list), function(i) {  # iterate over indices
+      setting <- settings_list[[i]]
+      model <- models[[i]]
       if (!is.null(python_env)) {
         reticulate::use_virtualenv(python_env, required = TRUE)
       }
-
-      # N x 1 vector
-      mu <- list(c = seq(5, 1, length.out = n))
-      mu$c[c(1, 2)] <- mu$c[c(2, 1)]; # hand-code factor loadings for n = 50 (common part)
-      trt <- numeric(n); trt[1] <- 1; # select the unit with the second largest loadings to be the treated unit
-      t_total <- setting$t_total
-      k_total <- setting$k_total
-
-      model <- generateModel(t_total, k_total, trt, mu, rho, n)
-
       columns_bias <- c("sep","cat","avg","Q")
       bias_sim <- data.frame(matrix(nrow = 0, ncol = length(columns_bias)))
       colnames(bias_sim) <- columns_bias
-
       all_results <- lapply(1:n_sim, function(s) {
         iter_start = proc.time()
-        result <-fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40,embedding_dim)
+        result <- fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40, embedding_dim)
         result$iter_time <- (proc.time() - iter_start)["elapsed"]
         return(result)
       })
