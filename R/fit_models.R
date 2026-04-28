@@ -91,12 +91,6 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   # oracle_bias_Q <- SCMbias(model_t1[-trt,1],model_t1[trt,1],Q_weights) # this may not be the correct dimensions.
 
   return(list("oracle_bias" = c(oracle_bias_sep, oracle_bias_cat, oracle_bias_avg,as.numeric(oracle_bias_Q)), # added bias_Q
-              "out" = out,
-              "out_trt" = out_trt,
-              "out_control" = out_control,
-              "model_t1" = model_t1,
-              "w_sep" = w_sep,
-              "w_cat" = w_cat,
-              "w_avg" = w_avg
+              "iter_time" = NULL
   ))
 }
