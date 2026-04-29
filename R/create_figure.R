@@ -51,5 +51,5 @@ create_figure <- function(n_sim,all_bias_sim_long, output_dir = getwd()) {
   pdf(file.path(output_dir, bias_fig_name))
   print(p)
   dev.off()
-  return(invisible(p))
+  return(p)
 }
