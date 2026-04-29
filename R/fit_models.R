@@ -73,7 +73,7 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
 
   # targets, covariates, embedding_dim=embedding_dim, n_iterations=1000,
   # reg_Q=0, reg_w=0, verbose=True, num_timepoints = T,ortho=False
-  if (qual == donors) {
+  if (qual == "outcomes") {
     result <- lqsynth$synthOutcomes(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0,0, FALSE,NULL,FALSE)
 
   } else {
