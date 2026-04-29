@@ -91,7 +91,10 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   w_learnQ <- reticulate::py_to_r(result[[2]])
 
   # we use the Q_weights just as w_sep, w_cat, w_avg
-  Q_weights <- Q_matrix %*% w_learnQ
+  if (qual == "donors") {
+    Q_weights <- Q_matrix %*% w_learnQ
+  }
+
 
   ## calculate bias
   model_t1 <- model[((n * t_total)+1):(n * (t_total+1)),]
