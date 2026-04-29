@@ -19,7 +19,7 @@
 #'                  )
 #' }
 #' @export
-run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=NULL) {
+run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=FALSE) {
   message("Running simulation...(Ignore silly CVXPY errors)")
   if (is.null(num_workers)) {
     num_workers <- parallel::detectCores() - 1
@@ -34,12 +34,6 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
   } else {
     embedding_dim = D
   }
-  if (is.null(ortho)) {
-    ortho = FALSE
-  } else {
-    ortho = TRUE
-  }
-
 
 
   suppressWarnings(suppressMessages({
