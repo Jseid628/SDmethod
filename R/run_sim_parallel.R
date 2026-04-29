@@ -10,6 +10,7 @@
 #' @param num_workers Number of cores to use to run the simulation
 #' @param n_units How many total units should be included in simulation, treated plus donors
 #' @param D Embedding dimension of matrix Q
+#' @param qual Aspect of the data to which the embedding be applied - donors or outcomes. Defaults to donors.
 #'
 #' @examples
 #' \dontrun{
@@ -19,7 +20,7 @@
 #'                  )
 #' }
 #' @export
-run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=FALSE) {
+run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=FALSE,qual=donors) {
   message("Running simulation...(Ignore silly CVXPY errors)")
   if (is.null(num_workers)) {
     num_workers <- parallel::detectCores() - 1

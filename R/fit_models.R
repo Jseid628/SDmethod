@@ -9,13 +9,15 @@
 #' @param num_timepoints Number of training timepoints to use. Defaults to t_total.
 #' @param embedding_dim  Dimension into which the matrix Q embeds the donors, ie, num synthetic donors
 #' @param ortho Should the method be run using orthogonal matrix Q
+#' @param qual aspect of the data to which the embedding be applied - donors or outcomes.
 #'
 #' @export
-fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL,embedding_dim,ortho) {
+fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL,embedding_dim,ortho, qual) {
 
   python_path <- system.file("python", package = "SDmethod")
   morph <- reticulate::import_from_path("morphData", path = python_path)
   lqorth <- reticulate::import_from_path("learnQorthogonal", path = python_path)
+  lqsynth <- reticulate::import_from_path("synthOutcomesQ", path = python_path)
   lq <- reticulate::import_from_path("learnQ", path = python_path)
 
   # Use only first num_timepoints if specified
@@ -69,12 +71,22 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   test_target_vector <- reticulate::py_to_r(result[[3]])
   test_covariate_matrix <- reticulate::py_to_r(result[[4]])
 
-  if (ortho == FALSE) {
-    # defaults to embedding dimension of 10.
-    result <- lq$learnQ(train_target_vectors, train_covariate_matrices,10L, 1000L, 1.0, 10.0, verbose=FALSE)
+  # targets, covariates, embedding_dim=embedding_dim, n_iterations=1000,
+  # reg_Q=0, reg_w=0, verbose=True, num_timepoints = T,ortho=False
+  if (qual == donors) {
+    result <- lqsynth$synthOutcomes(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0,0, FALSE,NULL,FALSE)
+
   } else {
-    result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0.0, 0.0, FALSE, NULL, "eye", FALSE)
+    if (ortho == FALSE) {
+      # defaults to embedding dimension of 10.
+      result <- lq$learnQ(train_target_vectors, train_covariate_matrices,10L, 1000L, 1.0, 10.0, verbose=FALSE)
+    } else {
+      result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0.0, 0.0, FALSE, NULL, "eye", FALSE)
+    }
+
   }
+
+
   Q_matrix <- reticulate::py_to_r(result[[1]])
   w_learnQ <- reticulate::py_to_r(result[[2]])
 
@@ -84,13 +96,15 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   ## calculate bias
   model_t1 <- model[((n * t_total)+1):(n * (t_total+1)),]
 
+  oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], Q_weights)))
+
   # just calculate the bias in the first outcome.
 
   oracle_bias_sep <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_sep)))
   oracle_bias_cat <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_cat)))
   oracle_bias_avg <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_avg)))
   # Add bias calculation for Q weights here:
-  oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], Q_weights)))
+
 
   # oracle_bias_sep <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_sep)
   # oracle_bias_cat <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_cat)
