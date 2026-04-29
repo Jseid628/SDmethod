@@ -71,7 +71,7 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
 
   if (ortho == FALSE) {
     # defaults to embedding dimension of 10.
-    result <- lq$learnQ(train_target_vectors, train_covariate_matrices,10, 1000L, 1.0, 10.0, verbose=FALSE)
+    result <- lq$learnQ(train_target_vectors, train_covariate_matrices,10L, 1000L, 1.0, 10.0, verbose=FALSE)
   } else {
     result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0.0, 0.0, FALSE, NULL, "eye", FALSE)
   }
