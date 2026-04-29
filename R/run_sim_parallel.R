@@ -20,7 +20,7 @@
 #'                  )
 #' }
 #' @export
-run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=FALSE,qual=donors) {
+run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=FALSE,qual= "donors") {
   message("Running simulation...(Ignore silly CVXPY errors)")
   if (is.null(num_workers)) {
     num_workers <- parallel::detectCores() - 1
@@ -76,7 +76,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
       colnames(bias_sim) <- columns_bias
       all_results <- lapply(1:n_sim, function(s) {
         iter_start = proc.time()
-        result <- fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40, embedding_dim, ortho)
+        result <- fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40, embedding_dim, ortho,qual)
         result$iter_time <- (proc.time() - iter_start)["elapsed"]
         return(result)
       })
