@@ -1,5 +1,4 @@
-#' Ensure the proper python dependencies are loaded
-#'
+#' @noRd
 .onLoad <- function(libname, pkgname) {
   reticulate::py_require(c("cvxpy", "numpy", "torch"))
 }

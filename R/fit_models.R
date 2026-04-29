@@ -7,12 +7,16 @@
 #' @param t_total number of pre-treatment periods
 #' @param variance variance of the noise term
 #' @param num_timepoints Number of training timepoints to use. Defaults to t_total.
+#' @param embedding_dim  Dimension into which the matrix Q embeds the donors, ie, num synthetic donors
+#' @param ortho Should the method be run using orthogonal matrix Q
+#'
 #' @export
-fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL,embedding_dim) {
+fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL,embedding_dim,ortho) {
 
   python_path <- system.file("python", package = "SDmethod")
   morph <- reticulate::import_from_path("morphData", path = python_path)
   lqorth <- reticulate::import_from_path("learnQorthogonal", path = python_path)
+  lq <- reticulate::import_from_path("learnQ", path = python_path)
 
   # Use only first num_timepoints if specified
   if (!is.null(num_timepoints) & t_total == 40) {
@@ -65,8 +69,12 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   test_target_vector <- reticulate::py_to_r(result[[3]])
   test_covariate_matrix <- reticulate::py_to_r(result[[4]])
 
-  # using the orthogonal, fixed weights version of the estimator
-  result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0.0, 0.0, FALSE, NULL, "eye", FALSE)
+  if (ortho == FALSE) {
+    # defaults to embedding dimension of 10.
+    result <- lq$learnQ(train_target_vectors, train_covariate_matrices, 1000L, 1.0, 10.0, FALSE,)
+  } else {
+    result <- lqorth$learnQorthogonal(train_target_vectors, train_covariate_matrices, as.integer(embedding_dim), 1000L, 0.0, 0.0, FALSE, NULL, "eye", FALSE)
+  }
   Q_matrix <- reticulate::py_to_r(result[[1]])
   w_learnQ <- reticulate::py_to_r(result[[2]])
 

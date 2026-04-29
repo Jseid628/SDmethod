@@ -15,10 +15,16 @@
 #'         )
 #' }
 #' @export
-run_sim <- function(rho,n_sim, output_dir = getwd(),python_env=NULL) {
+run_sim <- function(rho,n_sim, output_dir = getwd(),python_env=NULL, ortho=NULL) {
   if (!is.null(python_env)) {
     reticulate::use_virtualenv(python_env, required = TRUE)
   }
+  if (is.null(ortho)) {
+    ortho = FALSE
+  } else {
+    ortho = TRUE
+  }
+
   message("Running simulation....")
   # factor loadings
   n <- 10 # number of units, the first unit is treated
@@ -62,7 +68,7 @@ run_sim <- function(rho,n_sim, output_dir = getwd(),python_env=NULL) {
         reticulate::use_virtualenv(python_env, required = TRUE)
       }
       iter_start = proc.time()
-      result <-fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40)
+      result <-fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40,ortho)
       result$iter_time <- (proc.time() - iter_start)["elapsed"]
       return(result)
     })

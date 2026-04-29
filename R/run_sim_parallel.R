@@ -8,7 +8,8 @@
 #' @param output_dir The user's working directory
 #' @param python_env Path to a python virtual environment with the necessary dependencies, see README.
 #' @param num_workers Number of cores to use to run the simulation
-#' @param n_units
+#' @param n_units How many total units should be included in simulation, treated plus donors
+#' @param D Embedding dimension of matrix Q
 #'
 #' @examples
 #' \dontrun{
@@ -18,7 +19,7 @@
 #'                  )
 #' }
 #' @export
-run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL) {
+run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=NULL) {
   message("Running simulation...(Ignore silly CVXPY errors)")
   if (is.null(num_workers)) {
     num_workers <- parallel::detectCores() - 1
@@ -33,6 +34,12 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
   } else {
     embedding_dim = D
   }
+  if (is.null(ortho)) {
+    ortho = FALSE
+  } else {
+    ortho = TRUE
+  }
+
 
   suppressWarnings(suppressMessages({
     settings_list <- list(
@@ -73,7 +80,7 @@ run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, n
       colnames(bias_sim) <- columns_bias
       all_results <- lapply(1:n_sim, function(s) {
         iter_start = proc.time()
-        result <- fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40, embedding_dim)
+        result <- fit_models(model, n, trt, k_total, t_total, variance = 1, num_timepoints = 40, embedding_dim, ortho)
         result$iter_time <- (proc.time() - iter_start)["elapsed"]
         return(result)
       })
