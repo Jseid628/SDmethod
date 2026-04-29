@@ -90,16 +90,20 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   Q_matrix <- reticulate::py_to_r(result[[1]])
   w_learnQ <- reticulate::py_to_r(result[[2]])
 
-  # we use the Q_weights just as w_sep, w_cat, w_avg
-  if (qual == "donors") {
-    Q_weights <- Q_matrix %*% w_learnQ
-  }
-
 
   ## calculate bias
   model_t1 <- model[((n * t_total)+1):(n * (t_total+1)),]
 
-  oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], Q_weights)))
+  # we use the Q_weights just as w_sep, w_cat, w_avg
+  if (qual == "donors") {
+    Q_weights <- Q_matrix %*% w_learnQ
+    oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], Q_weights)))
+  } else {
+    oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_learnQ)))
+  }
+
+
+
 
   # just calculate the bias in the first outcome.
 
