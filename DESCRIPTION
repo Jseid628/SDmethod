@@ -2,7 +2,7 @@ Package: SDmethod
 Title: Synthetic Control Weights for Multiple Outcomes
 Version: 0.0.0.9000
 Authors@R: 
-    person("Jesse", "Seid", , "jesses@pennmedicine.upenn.edu", role = c("aut", "cre"))
+    person("Jesse", "Seid", email = "jesses@pennmedicine.upenn.edu", role = c("aut", "cre"))
 Description: The package compares a new estimator for synthetic controls with multiple outcomes against three existing estimators. It builds off code created by Dr. Eli Ben-Michael (Carnegie Mellon University). To find the new estimator, gradient descent through the space of orthogonal matrices is used to find an optimal embedding of the donor units. The resulting estimator is an average of the "synthetic donor outcomes," which are the true donor outcomes under the optimal embedding.
 License: MIT + file LICENSE
 Encoding: UTF-8

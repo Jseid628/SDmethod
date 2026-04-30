@@ -31,6 +31,8 @@ run_sim_parallel(
 
 \item{D}{Embedding dimension of matrix Q}
 
+\item{ortho}{Should the embedding matrix be orthogonal}
+
 \item{qual}{Aspect of the data to which the embedding be applied - donors or outcomes. Defaults to donors.}
 }
 \description{
@@ -39,9 +41,8 @@ It also returns a summary of the lengths of the Monte Carlo iterations.
 }
 \examples{
 \dontrun{
-run_sim_parallel(rho = 1,
-                 n_sim = 3,
-                 python_env="path/to/your/env"
-                 )
+run_sim_parallel(1, 1000, python_env = "path/to/your/env",
+                 num_workers = 14, n_units = 50, D = 10,
+                 ortho=FALSE, qual = "donors")
 }
 }
