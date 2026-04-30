@@ -7,12 +7,11 @@
 #' @param n_sim Number of simulations
 #' @param output_dir The user's working directory
 #' @param python_env Path to a python virtual environment with the necessary dependencies, see README.
+#' @param ortho Should the embedding matrix be orthogonal
+#'
 #' @examples
 #' \dontrun{
-#' run_sim(rho = 1,
-#'         n_sim = 3,
-#'         python_env="path/to/your/env"
-#'         )
+#' run_sim(1, 1000, python_env = "path/to/your/env", ortho = FALSE)
 #' }
 #' @export
 run_sim <- function(rho,n_sim, output_dir = getwd(),python_env=NULL, ortho=FALSE) {

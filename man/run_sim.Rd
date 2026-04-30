@@ -4,7 +4,7 @@
 \alias{run_sim}
 \title{Run simulation serially}
 \usage{
-run_sim(rho, n_sim, output_dir = getwd(), python_env = NULL)
+run_sim(rho, n_sim, output_dir = getwd(), python_env = NULL, ortho = FALSE)
 }
 \arguments{
 \item{rho}{Mixing coefficient}

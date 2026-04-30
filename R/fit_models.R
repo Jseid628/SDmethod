@@ -33,8 +33,6 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   out_trt <- matrix(out[which(t_trt==1),],nrow = t_train,ncol =k_total)  # T x K matrix of outcomes for the treated unit
   out_control <- out[which(t_trt==0),] # ((N-1)xT) x (K) matrix of outcomes for the control units
 
-
-
   ## calculate SCM weights
   out_trt_sep <- out_trt[,1]
   out_control_sep <- matrix(out_control[,1], nrow = n-1,ncol=t_train)
@@ -86,15 +84,13 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
 
   }
 
-
   Q_matrix <- reticulate::py_to_r(result[[1]])
   w_learnQ <- reticulate::py_to_r(result[[2]])
-
 
   ## calculate bias
   model_t1 <- model[((n * t_total)+1):(n * (t_total+1)),]
 
-  # we use the Q_weights just as w_sep, w_cat, w_avg
+  # bias calculation for Q weights:
   if (qual == "donors") {
     Q_weights <- Q_matrix %*% w_learnQ
     oracle_bias_Q   <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], Q_weights)))
@@ -103,21 +99,10 @@ fit_models <- function(model,n,trt,k_total,t_total,variance, num_timepoints=NULL
   }
 
 
-
-
-  # just calculate the bias in the first outcome.
-
   oracle_bias_sep <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_sep)))
   oracle_bias_cat <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_cat)))
   oracle_bias_avg <- as.numeric(reticulate::py_to_r(SCMbias(model_t1[-trt,1], model_t1[trt,1], w_avg)))
-  # Add bias calculation for Q weights here:
 
-
-  # oracle_bias_sep <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_sep)
-  # oracle_bias_cat <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_cat)
-  # oracle_bias_avg <- SCMbias(model_t1[-trt,1],model_t1[trt,1],w_avg)
-
-  # oracle_bias_Q <- SCMbias(model_t1[-trt,1],model_t1[trt,1],Q_weights) # this may not be the correct dimensions.
 
   return(list("oracle_bias" = c(oracle_bias_sep, oracle_bias_cat, oracle_bias_avg,as.numeric(oracle_bias_Q)), # added bias_Q
               "iter_time" = NULL

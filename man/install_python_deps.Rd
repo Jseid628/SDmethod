@@ -2,10 +2,15 @@
 % Please edit documentation in R/install_deps.R
 \name{install_python_deps}
 \alias{install_python_deps}
-\title{Install required Python dependencies}
+\title{Installs required Python dependencies}
 \usage{
 install_python_deps(envname = "SDmethod_env", python = NULL)
 }
+\arguments{
+\item{envname}{The name of the environment}
+
+\item{python}{Path to a python version to use, can be left empty}
+}
 \description{
-Install required Python dependencies
+Creates a virtual environment with the necessary dependencies for the R package to work.
 }

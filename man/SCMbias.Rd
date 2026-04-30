@@ -6,6 +6,13 @@
 \usage{
 SCMbias(Y0, Y1, weights)
 }
+\arguments{
+\item{Y0}{Matrix of control outcomes}
+
+\item{Y1}{Vector of target outcomes}
+
+\item{weights}{The estimated synthetic control weights}
+}
 \description{
 Calculates the difference between the prediction and the truth.
 }

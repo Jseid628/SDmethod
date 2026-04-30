@@ -9,7 +9,11 @@ run_sim_parallel(
   n_sim,
   output_dir = getwd(),
   python_env = NULL,
-  num_workers = NULL
+  num_workers = NULL,
+  n_units = NULL,
+  D = NULL,
+  ortho = FALSE,
+  qual = "donors"
 )
 }
 \arguments{
@@ -22,6 +26,12 @@ run_sim_parallel(
 \item{python_env}{Path to a python virtual environment with the necessary dependencies, see README.}
 
 \item{num_workers}{Number of cores to use to run the simulation}
+
+\item{n_units}{How many total units should be included in simulation, treated plus donors}
+
+\item{D}{Embedding dimension of matrix Q}
+
+\item{qual}{Aspect of the data to which the embedding be applied - donors or outcomes. Defaults to donors.}
 }
 \description{
 This function creates a figure comparing the bias of the estimators in the users current working directory.

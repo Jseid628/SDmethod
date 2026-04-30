@@ -10,14 +10,14 @@
 #' @param num_workers Number of cores to use to run the simulation
 #' @param n_units How many total units should be included in simulation, treated plus donors
 #' @param D Embedding dimension of matrix Q
+#' @param ortho Should the embedding matrix be orthogonal
 #' @param qual Aspect of the data to which the embedding be applied - donors or outcomes. Defaults to donors.
 #'
 #' @examples
 #' \dontrun{
-#' run_sim_parallel(rho = 1,
-#'                  n_sim = 3,
-#'                  python_env="path/to/your/env"
-#'                  )
+#' run_sim_parallel(1, 1000, python_env = "path/to/your/env",
+#'                  num_workers = 14, n_units = 50, D = 10,
+#'                  ortho=FALSE, qual = "donors")
 #' }
 #' @export
 run_sim_parallel <- function(rho, n_sim, output_dir = getwd(),python_env=NULL, num_workers = NULL,n_units=NULL, D=NULL, ortho=FALSE,qual= "donors") {
